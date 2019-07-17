@@ -1,24 +1,23 @@
 package com.programming.techie.springngblog.controller;
 
 import com.programming.techie.springngblog.dto.PostDto;
-import com.programming.techie.springngblog.service.PostService;
+import com.programming.techie.springngblog.security.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 
-@RequestMapping("api/posts/")
 @RestController
+@RequestMapping("/api/posts/")
 public class PostController {
 
     @Autowired
     private PostService postService;
 
     @PostMapping
-    public ResponseEntity createPost(@Valid @RequestBody PostDto postDto) {
+    public ResponseEntity createPost(@RequestBody PostDto postDto) {
         postService.createPost(postDto);
         return new ResponseEntity(HttpStatus.OK);
     }

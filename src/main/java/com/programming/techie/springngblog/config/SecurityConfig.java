@@ -1,9 +1,6 @@
 package com.programming.techie.springngblog.config;
 
-import com.programming.techie.springngblog.repository.UserRepository;
-import com.programming.techie.springngblog.security.CustomAccessDeniedHandler;
 import com.programming.techie.springngblog.security.JwtAuthenticationFilter;
-import com.programming.techie.springngblog.security.UnauthorizedEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,13 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private UserDetailsService userDetailsService;
-    @Autowired
-    private UnauthorizedEntryPoint unauthorizedEntryPoint;
-    @Autowired
-    private CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -42,30 +33,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .cors()
-                .and()
-                .csrf()
-                .disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(unauthorizedEntryPoint)
-                .and()
+        httpSecurity.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/auth/*", "/api/posts/all", "/api/posts/get/*")
+                .antMatchers("/api/auth/**")
                 .permitAll()
-                .anyRequest().authenticated();
+                .anyRequest()
+                .authenticated();
 
-        // Add our custom JWT security filter
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(encoder());
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean
-    public PasswordEncoder encoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

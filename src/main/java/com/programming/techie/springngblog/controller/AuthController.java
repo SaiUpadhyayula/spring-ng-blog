@@ -1,6 +1,5 @@
 package com.programming.techie.springngblog.controller;
 
-import com.programming.techie.springngblog.dto.AuthenticationResponse;
 import com.programming.techie.springngblog.dto.LoginRequest;
 import com.programming.techie.springngblog.dto.RegisterRequest;
 import com.programming.techie.springngblog.service.AuthService;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,10 +24,8 @@ public class AuthController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        AuthenticationResponse authenticationResponse = authService.login(loginRequest);
-        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest loginRequest){
+        return authService.login(loginRequest);
     }
-
 }
